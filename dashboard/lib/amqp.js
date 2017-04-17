@@ -139,7 +139,6 @@ module.exports = {
                             global.tweetInfo[queue].words[key] = 0;
                         else global.tweetInfo[queue].words[key] = global.tweetInfo[queue].words[key] + 1
                     }
-                    var sorted = 
 
                     item.write('id: ' + (new Date()).toLocaleTimeString() + '\n');
                     item.write('data:' + JSON.stringify(global.tweetInfo[queue]) + '\n\n');

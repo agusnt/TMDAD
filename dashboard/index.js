@@ -3,15 +3,27 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const request = require('request');
-const amqp = require('./lib/amqp.js');
+const amqp = require('amqp');
 const config = require('./config');
-
 
 //==============================================================================
 // AMQP Connection
 //==============================================================================
 var brokerURL = config.amqp;
-amqp.startAMQ(brokerURL, () => {});
+var queue = null;
+var connection = amqp.createConnection(
+    { url: brokerURL + "?heartbeat=60", debug: true },
+    { reconnect: { strategy: 'constant', initial: 1000 } }
+);
+
+var exchange = null;
+connection.on('ready', function()
+{
+    connection.exchange('tweet', { type: 'fanout' }, function(ex)
+    {
+       exchange = ex; 
+    });
+});
 
 //Allow self signed certificate
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -50,7 +62,7 @@ app.get('/stats', function(req, res)
     // HTTP2 request to chooser
     var optionsChoser =
     {
-        url: config.route.sub,
+        url: config.choser.sub,
         method: 'POST',
         headers: {
             'Content-Type': 'application/javascript'
@@ -78,7 +90,50 @@ app.get('/stats', function(req, res)
         if (openConnections[req.query.search] === undefined) 
         {
             openConnections[req.query.search] = [res];
-            amqp.startWorker(req.query.search);
+            // Create a new queue for the element
+            connection.queue("my_queue", function(queue)
+            {
+                queue.bind(exchange, req.query.search);
+                queue.subscribe(function (msg)
+                {
+                    var encoded_payload = unescape(msg.data);
+                    var data = JSON.parse(encoded_payload);
+                    openConnections[data.search].forEach(function(item)
+                    {
+                        if (tweetInfo[data.search] === undefined) 
+                            tweetInfo[data.search] = {}
+                        // Stadistics information
+                        if (tweetInfo[data.search].numWords === undefined)
+                            tweetInfo[data.search].numWords = 0;
+                        else if (data.numWords !== undefined)
+                            tweetInfo[data.search].numWords = (tweetInfo[data.search].numWords + data.numWords) / 2;
+                        if (tweetInfo[data.search].numHashtag === undefined)
+                            tweetInfo[data.search].numHashtag = 0;
+                        else if (data.numHashtag !== undefined)
+                            tweetInfo[data.search].numHashtag = (tweetInfo[data.search].numHashtag + data.numHashtag) / 2;
+                        if (tweetInfo[data.search].numMentions === undefined)
+                            tweetInfo[data.search].numMentions = 0;
+                        else if (data.numMentions !== undefined)
+                            tweetInfo[data.search].numMentions = (tweetInfo[data.search].numMentions + data.numMentions) / 2;
+                        if (tweetInfo[data.search].numLinks === undefined)
+                            tweetInfo[data.search].numLinks = 0;
+                        else if (data.numLinks !== undefined)
+                            tweetInfo[data.search].numLinks = (tweetInfo[data.search].numLinks + data.numLinks) / 2;
+                        // Related Words
+                        if (tweetInfo[data.search].words === undefined)
+                            tweetInfo[data.search].words = {};
+                        for (var key in data.related)
+                        {
+                            if (tweetInfo[data.search].words[key] === undefined)
+                                tweetInfo[data.search].words[key] = 0;
+                            else tweetInfo[data.search].words[key] = tweetInfo[data.search].words[key] + 1
+                        }
+                        console.log(tweetInfo);
+                        item.write('id: ' + (new Date()).toLocaleTimeString() + '\n');
+                        item.write('data: ' + JSON.stringify(tweetInfo[data.search]) + '\n\n');
+                    });
+                });
+            });
         }
         else openConnections[req.query.search].push(res);
 
@@ -94,14 +149,14 @@ app.get('/stats', function(req, res)
 //==============================================================================
 // Let's go HTTP2 Server
 //==============================================================================
-spdy.createServer(options, app).listen(conf.port, (error) => {
+spdy.createServer(options, app).listen(port, (error) => {
     if (error)
     {
         console.error(error)
         return process.exit(1)
     } else 
     {
-        console.log('Listening on port: ' + conf.port + '.')
+        console.log('Listening on port: ' + port + '.')
     }
 });
 

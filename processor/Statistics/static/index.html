@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta charset="utf-8">
+        <title>TMDAD</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.3/angular.min.js"></script>
+        <script>
+            var app = angular.module('tmdad', []);
+            var source = undefined;
+
+            app.controller('twCtrl', ['$scope', '$http', ($scope, $http) =>
+            {
+                // On/Off 
+                $scope.related = true;
+                $scope.relatedOff = () => {
+                    //do logic for button 1
+                    $scope.related = !$scope.related;
+                    $http({
+                        method: 'POST',
+                        //Otro parametro que puede cambiar
+                        url: '/off'
+                    }).then(function successCallback(response)
+                    {
+                        alert("Statistics turn off");
+                    }, function errorCallback(response)
+                    {
+                        alert("Statistics already off");
+                    });
+                }
+                $scope.relatedOn = () => {
+                    //do logic for button 1
+                    $scope.related = !$scope.related;
+                    $http({
+                        method: 'POST',
+                        //Otro parametro que puede cambiar
+                        url: '/on'
+                    }).then(function successCallback(response)
+                    {
+                        alert("Statistics turn on");
+                    }, function errorCallback(response)
+                    {
+                        alert("Statistics already on");
+                    });
+                }
+            }]);
+        </script>
+    </head>
+    <body ng-app=tmdad ng-controller=twCtrl>
+        <div class="container main">
+        <div class="row">
+            <div class="span10 offset1" style="text-align: center">
+                <h2>Statistics</h2>
+                <h2>Proccessor Config</h2>
+                <!-- Aqui hay un valor que puede tener que cambiar -->
+		        <a href="/auth/twitter">login</a>
+                <p></p>
+                <div ng-switch on="related">
+                    <button ng-switch-when='true' ng-click='relatedOn()'>Statistics ON</button>
+                    <button ng-switch-when='false' ng-click='relatedOff()'>Statistics OFF</button>
+                </div>
+            </div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="span10 offset1" style="text-align: center">
+                <h2>Back to Dashboard</h2>
+                <!-- Aqui hay un valor que puede tener que cambiar -->
+		        <a href="https://localhost:8080/">login</a>
+            </div>
+        </div>
+        </div>
+    </body>
+</html>

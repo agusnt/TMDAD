@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const bodyParser = require('body-parser');
-const amqp = require('./amqp.js');
+const amqp = require('amqp');
 const Twitter = require('node-tweet-stream');
 const config = require('./config');
 
@@ -19,12 +19,15 @@ var searchParameter = []
 
 // Broker address
 //var brokerURL = process.env.CLOUDAMQP_URL ? process.env.CLOUDAMQP_URL : "amqp://localhost";
-var brokerURL = config.amqp;
+var brokerURL = config.amqp
 
 /**
  * Initialize connection with AMQP
  */
-amqp.startAMQ(brokerURL, amqp.startPublisher);
+var connection = amqp.createConnection(
+    { url: brokerURL + "?heartbeat=60", debug: true },
+    { reconnect: { strategy: 'constant', initial: 1000 } }
+);
 
 // Tweet configuration
 t.on('tweet', function (tweet) {
@@ -33,8 +36,12 @@ t.on('tweet', function (tweet) {
         if (tweet.text.indexOf(item))
         {
             tweet.search = item;
-            amqp.publish("", "tweet", new Buffer(JSON.stringify(tweet)));
-            //console.log("[Chooser] Published Tweet");
+            connection.exchange('tweet', {type: 'fanout'}, function(exchange)
+            {
+                console.log("[Chooser] Published Tweet");
+                var encoded_payload = JSON.stringify(tweet);
+                exchange.publish('source', encoded_payload, {});
+            });
         }
     });
 });
@@ -52,7 +59,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Server options
-const options = {
+const optionsServer = {
     key: fs.readFileSync(__dirname + '/certificate/server.key'),
     cert:  fs.readFileSync(__dirname + '/certificate/server.crt')
 }
@@ -88,7 +95,7 @@ app.delete('/usub', (req, res) => {
 
 //------------------------------------------------------------------------------
 // Load SSL and initialize server
-spdy.createServer(options, app).listen(config.port, (error) => {
+spdy.createServer(optionsServer, app).listen(config.port, (error) => {
     if (error)
     {
         console.error(error)
