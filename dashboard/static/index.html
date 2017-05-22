@@ -11,6 +11,7 @@
 
             app.controller('twCtrl', ['$scope', '$http', ($scope, $http) =>
             {
+                $scope.tw = [];
                 $scope.submitForm = () =>
                 {
                     if (source !== undefined){source.close();}
@@ -24,13 +25,33 @@
                     { 
                         $scope.$apply(() => 
                         { 
-                            aux = JSON.parse(msg.data)
-                            console.log(aux);
-                            $scope.msg = JSON.parse(msg.data); 
+                            //console.log(msg.data);
+                            aux = JSON.parse(msg.data);
+                            if (aux.tr == true) $scope.tw.push(aux);
+                            else $scope.msg = JSON.parse(msg.data);
+                            
                         });
                     }, false);
                     // EventSource is closed
                     source.addEventListener('close', (msg) => {console.log("Closed...");});
+                }
+                $scope.db = () =>
+                {
+                    alert("Loading")
+                    console.log($scope.dbf.search)
+                    $http({
+                        method: 'GET',
+                        url: 'db',
+                        params: {search: $scope.dbf.search}
+                    }).then(function successCallback(response)
+                    {
+                        //aux = JSON.parse(response.data);
+                        console.log(response.data)
+                        $scope.msg = response.data;
+                        $scope.tw = response.data.tweet
+                    }, function errorCallback(response)
+                    {
+                    });
                 }
             }]);
         </script>
@@ -47,20 +68,17 @@
             <input type="submit"/>
         </form>
         </div>
+        <div class="row span10 offset1" style="text-align: center">
+        <div class="span10 offset1" style="text-align: center">
+            <h2>Data Base</h2>
+        </div>
+        <form ng-submit="db()"> 
+            <br><input type="text" ng-model="dbf.search">
+            <input type="submit"/>
+        </form>
+        </div>
         </div>
 	    <hr/>
-        <div class="container main">
-        <div class="row">
-            <div class="span10 offset1" style="text-align: center">
-                <h2>Proccessor Config</h2>
-                <!-- Aqui hay un valor que puede tener que cambiar -->
-		        <a href="https://localhost:8082/">Related Words</a>
-                <br/>
-                <!-- Aqui hay un valor que puede tener que cambiar -->
-		        <a href="https://localhost:8083/">Statistics</a>
-            </div>
-        </div>
-        <hr/>
         <div class="container main">
         <div class="row">
             <div class="span10 offset1" style="text-align: center">
@@ -71,12 +89,23 @@
             <div class="span8 offset2">
                 <table class="table table-striped">
                     <thead>
-                        <tr>
-                            <th>Property</th>
-                            <th>Value</th>
-                        </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <th>Tweets</th>
+                        </tr>
+                        <tr ng-repeat= "t in tw | limitTo:-5">
+                            <td>{{ t.text }}</td>
+                            <td> -- </td>
+                            <td>{{ t.textTr }}</td>
+                            <td> <hr/>
+                        </tr>
+                        <tr>
+                            <th><hr/></th>
+                        </tr>
+                        <tr>
+                            <th>Statiscs</th>
+                        </tr>
                         <tr>
                             <td>Words:</td>
                             <td>{{msg.numWords}}</td>
@@ -94,16 +123,13 @@
                             <td>{{msg.numLinks}}</td>
                         </tr>
                         <tr>
-                            <th>Lang</th>
-                        </tr>
-                        <tr ng-repeat= "(key, value) in msg.lang">
-                            <td>{{ key }}</td>
-                            <td>{{ value }}</td>
+                            <th><hr/></th>
                         </tr>
                         <tr>
                             <th>Related words</th>
                         </tr>
-                        <tr ng-repeat= "(key, value) in msg.words">
+                        <tr><hr/><tr/>
+                        <tr ng-repeat= "(key, value) in msg.words | limitTo:-5">
                             <td>{{ key }}</td>
                             <td>{{ value }}</td>
                         </tr>

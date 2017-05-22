@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta charset="utf-8">
+        <title>TMDAD</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.3/angular.min.js"></script>
+        <script>
+            var app = angular.module('tmdad', []);
+            var source = undefined;
+
+            app.controller('twCtrl', ['$scope', '$http', ($scope, $http) =>
+            {
+                // On/Off 
+                $scope.related = true;
+                $scope.relatedOff = () => {
+                    //do logic for button 1
+                    $scope.related = !$scope.related;
+                    $http({
+                        method: 'POST',
+                        url: '/related_off'
+                    }).then(function successCallback(response)
+                    {
+                        alert("Related Words turn off");
+                    }, function errorCallback(response)
+                    {
+                        if (response.status == 401) alert("Please Login")
+                        else alert("Related Words already off");
+                    });
+                }
+                $scope.relatedOn = () => {
+                    //do logic for button 1
+                    $scope.related = !$scope.related;
+                    $http({
+                        method: 'POST',
+                        //Otro parametro que puede cambiar
+                        url: '/related_on'
+                    }).then(function successCallback(response)
+                    {
+                        alert("Related Words turn on");
+                    }, function errorCallback(response)
+                    {
+                        if (response.status == 401) alert("Please Login")
+                        else alert("Related Words already on");
+                    });
+                }
+                $scope.brokerrelated = () => {
+                    console.log("R")
+                    //do logic for button 1
+                    $http({
+                        method: 'POST',
+                        //Otro parametro que puede cambiar
+                        url: 'related_broker',
+                        params: {broker: $scope.Rbroker}
+                    }).then(function successCallback(response)
+                    {
+                        alert("Broker Address is changed")
+                    }, function errorCallback(response)
+                    {
+                        if (response.status == 401) alert("Please Login")
+                    });
+                }
+                $scope.statistics = true;
+                $scope.statisticsOff = () => {
+                    //do logic for button 1
+                    $scope.statistics = !$scope.statistics;
+                    $http({
+                        method: 'POST',
+                        url: '/statistics_off'
+                    }).then(function successCallback(response)
+                    {
+                        alert("Statistics turn off");
+                    }, function errorCallback(response)
+                    {
+                        if (response.status == 401) alert("Please Login")
+                        else alert("Statistics already off");
+                    });
+                }
+                $scope.statisticsOn = () => {
+                    //do logic for button 1
+                    $scope.statistics = !$scope.statistics;
+                    $http({
+                        method: 'POST',
+                        //Otro parametro que puede cambiar
+                        url: '/statistics_on'
+                    }).then(function successCallback(response)
+                    {
+                        alert("Statistics turn on");
+                    }, function errorCallback(response)
+                    {
+                        if (response.status == 401) alert("Please Login")
+                        else alert("Statistics already on");
+                    });
+                }
+                $scope.brokerstatistics = () => {
+                    console.log("S")
+                    //do logic for button 1
+                    $http({
+                        method: 'POST',
+                        //Otro parametro que puede cambiar
+                        url: 'statistics_broker',
+                        params: {broker: $scope.Sbroker}
+                    }).then(function successCallback(response)
+                    {
+                        alert("Broker Address is changed")
+                    }, function errorCallback(response)
+                    {
+                        if (response.status == 401) alert("Please Login")
+                    });
+                }// On/Off 
+                $scope.language = true;
+                $scope.languageOff = () => {
+                    //do logic for button 1
+                    $scope.language = !$scope.language;
+                    $http({
+                        method: 'POST',
+                        url: '/language_off'
+                    }).then(function successCallback(response)
+                    {
+                        alert("Language turn off");
+                    }, function errorCallback(response)
+                    {
+                        if (response.status == 401) alert("Please Login")
+                        else alert("Language already off");
+                    });
+                }
+                $scope.languageOn = () => {
+                    //do logic for button 1
+                    $scope.language = !$scope.language;
+                    $http({
+                        method: 'POST',
+                        //Otro parametro que puede cambiar
+                        url: '/language_on'
+                    }).then(function successCallback(response)
+                    {
+                        alert("Language turn on");
+                    }, function errorCallback(response)
+                    {
+                        if (response.status == 401) alert("Please Login")
+                        else alert("Language already on");
+                    });
+                } 
+                $scope.brokerLang = () => {
+                    console.log("L")
+                    //do logic for button 1
+                    $http({
+                        method: 'POST',
+                        //Otro parametro que puede cambiar
+                        url: 'language_broker',
+                        params: {broker: $scope.Lbroker}
+                    }).then(function successCallback(response)
+                    {
+                        alert("Broker Address is changed")
+                    }, function errorCallback(response)
+                    {
+                        if (response.status == 401) alert("Please Login")
+                    });
+                }
+                $scope.TranslateLang = () => {
+                    console.log("T")
+                    //do logic for button 1
+                    $http({
+                        method: 'POST',
+                        //Otro parametro que puede cambiar
+                        url: 'language_translate',
+                        params: {lang: $scope.translate}
+                    }).then(function successCallback(response)
+                    {
+                        alert("Broker Address is changed")
+                    }, function errorCallback(response)
+                    {
+                        if (response.status == 401) alert("Please Login")
+                    });
+                }
+                $scope.chooser = true;
+                $scope.chooserOff = () => {
+                    //do logic for button 1
+                    $scope.chooser = !$scope.chooser;
+                    $http({
+                        method: 'POST',
+                        url: '/chooser_off'
+                    }).then(function successCallback(response)
+                    {
+                        alert("Chooser turn off");
+                    }, function errorCallback(response)
+                    {
+                        if (response.status == 401) alert("Please Login")
+                        else alert("Chooser already off");
+                    });
+                }
+                $scope.chooserOn = () => {
+                    //do logic for button 1
+                    $scope.chooser = !$scope.chooser;
+                    $http({
+                        method: 'POST',
+                        //Otro parametro que puede cambiar
+                        url: '/chooser_on'
+                    }).then(function successCallback(response)
+                    {
+                        alert("Chooser turn on");
+                    }, function errorCallback(response)
+                    {
+                        if (response.status == 401) alert("Please Login")
+                        else alert("Chooser already on");
+                    });
+                }
+                $scope.brokerChooser = () => {
+                    //do logic for button 1
+                    $http({
+                        method: 'POST',
+                        //Otro parametro que puede cambiar
+                        url: 'chooser_broker',
+                        params: {broker: $scope.Cbroker}
+                    }).then(function successCallback(response)
+                    {
+                        alert("Broker Address is changed")
+                    }, function errorCallback(response)
+                    {
+                        if (response.status == 401) alert("Please Login")
+                    });
+                }
+            }]);
+        </script>
+    </head>
+    <body ng-app=tmdad ng-controller=twCtrl>
+        <div class="container main">
+        <div class="row">
+            <div class="span10 offset1" style="text-align: center">
+                <h2>Proccessor Config</h2>
+                <!-- Aqui hay un valor que puede tener que cambiar -->
+		        <a href="/auth/twitter">login</a>
+                <hr/>
+                <div ng-switch on="related">
+                    <button ng-switch-when='true' ng-click='relatedOn()'>Related Word ON</button>
+                    <button ng-switch-when='false' ng-click='relatedOff()'>Related Word OFF</button>
+                </div>
+                <h4>Broker Related</h4>
+                <div>
+                    <form ng-submit="brokerrelated()"> 
+                        <br><input type="text" ng-model="Rbroker">
+                        <input type="submit"/>
+                    </form>
+                </div>                
+                <hr/>
+                <div ng-switch on="statistics">
+                    <button ng-switch-when='true' ng-click='statisticsOn()'>Statistics ON</button>
+                    <button ng-switch-when='false' ng-click='statisticsOff()'>Statistics OFF</button>
+                </div>
+                <h4>Broker Statistics</h4>
+                <div>
+                    <form ng-submit="brokerstatistics()"> 
+                        <br><input type="text" ng-model="Sbroker">
+                        <input type="submit"/>
+                    </form>
+                </div>                
+                <hr/>
+                <div ng-switch on="language">
+                    <button ng-switch-when='true' ng-click='languageOn()'>Language ON</button>
+                    <button ng-switch-when='false' ng-click='languageOff()'>Language OFF</button>
+                </div>
+                <h4>Broker Language</h4>
+                <div>
+                    <form ng-submit="brokerLang()"> 
+                        <br><input type="text" ng-model="Lbroker">
+                        <input type="submit"/>
+                    </form>
+                </div>
+                <h4>Translate Language</h4>
+                <div>
+                    <form ng-submit="TranslateLang()"> 
+                        <br><input type="text" ng-model="translate">
+                        <input type="submit"/>
+                    </form>
+                </div>
+                <hr/>
+                <h2> Chooser </h2>
+                <div ng-switch on="chooser">
+                    <button ng-switch-when='true' ng-click='chooserOn()'>Chooser ON</button>
+                    <button ng-switch-when='false' ng-click='chooserOff()'>Chooser OFF</button>
+                </div>
+                <h4>Broker</h4>
+                <div>
+                    <form ng-submit="brokerChooser()"> 
+                        <br><input type="text" ng-model="Cbroker">
+                        <input type="submit"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <hr/>
+        </div>
+    </body>
+</html>
